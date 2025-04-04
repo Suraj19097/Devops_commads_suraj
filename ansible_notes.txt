@@ -1,0 +1,467 @@
+1. AD-HOC command-:
+   Ansible ad-hoc commands are simple one-liners used to perform quick tasks on remote servers without writing a full playbook. They are useful for executing single or small sets of tasks on one or more remote nodes directly from the command line.
+
+The basic syntax for an Ansible ad-hoc command is:
+    ansible <host-pattern> -m <module> -a "<module-options>"
+
+<host-pattern>: Specifies the group of hosts on which the command will be run (e.g., all, webservers, dbservers, etc.).
+-m <module>: Specifies the Ansible module to use (e.g., ping, shell, yum, etc.).
+-a "<module-options>": Passes the options or arguments to the module.
+
+  Ad-hoc commands are powerful for quick operations but are not ideal for complex tasks, which are better suited to Ansible playbooks.
+
+2. Ansible Playbook-:
+  Ansible playbooks are YAML files that define a series of tasks to be executed on remote hosts. They allow for more complex and organized automation compared to ad-hoc commands. Playbooks are used to manage configurations, deploy applications, and orchestrate complex workflows across multiple systems.
+ Key Features of Playbooks
+Idempotency: Playbooks are designed to be idempotent, meaning they can be run multiple times without changing the outcome (if the system is already in the desired state).
+Flexibility: Playbooks can include conditionals, loops, and handlers, allowing for complex workflows.
+Reusability: Through the use of roles and includes, playbooks can be broken down into reusable components.
+
+3.ansible variable-:
+  Ansible variables are used to store values that can be reused throughout your playbooks, making them more flexible, modular, and easier to maintain. Variables can hold any type of data: strings, numbers, lists, dictionaries, and even complex data structures. They can be defined in multiple ways and at different levels, allowing for a high degree of customization
+
+Types of Ansible Variables-:
+
+ 1.Playbook Variables:
+	Variables defined directly in the playbook under the vars section.
+ 
+ 2.Inventory Variables:
+	Variables defined in the inventory file (or in separate variable files associated with the inventory). These can be host-specific or group-specific.
+
+ 3.Group and Host Variables:
+	Group variables (group_vars/) and host variables (host_vars/) are stored in separate files under the group_vars/ and host_vars/ directories in your Ansible directory structure.
+ 
+ 4.Fact Variables:
+	Ansible gathers information about hosts, known as "facts," which can be accessed as variables. These include system information, such as IP addresses, OS type, etc.
+
+ 5.Registered Variables:
+	Variables created by registering the result of a task. These variables can be used later in the playbook
+ 
+ 6.Extra Variables (--extra-vars):
+	Variables passed directly on the command line when running a playbook. These have the highest precedence and can override other variable values.
+
+ 7.Role Variables:
+	Variables defined within a role, usually in the defaults/main.yml or vars/main.yml files of the role.
+
+---Variable Precedence
+	Ansible has a well-defined order of precedence for variables, with higher precedence variables overriding lower ones. The general order (from lowest to highest precedence) is:
+
+1.Defaults: Role defaults (defaults/main.yml).
+2.Inventory Variables: Defined in inventory files or associated files.
+3.Playbook Variables: Defined in the playbook using vars.
+4.Host and Group Variables: Defined in host_vars/ and group_vars/.
+5.Facts: Gathered facts.
+6.Role Variables: Defined in the role (vars/main.yml).
+7.Registered Variables: Defined using the register keyword.
+8.Extra Variables: Passed in the command line with --extra-vars.
+
+
+3. Ansible Vault-:
+  Ansible Vault is a feature that allows you to encrypt sensitive data within your Ansible projects, such as passwords, API keys, certificates, and other secrets. It ensures that sensitive information is securely stored and managed, while still allowing it to be used within your playbooks.
+
+Key Features of Ansible Vault
+Encryption and Decryption: Vault allows you to encrypt and decrypt entire files or specific variables.
+Integration with Playbooks: Encrypted data can be used seamlessly in playbooks without requiring any additional changes to the playbook logic.
+Password Management: Vault can use a password or a password file to encrypt and decrypt the data.
+
+  Basic Usage of Ansible Vault
+1. Encrypting a File
+To encrypt a file with Ansible Vault, use the ansible-vault encrypt command:
+
+ansible-vault encrypt vars.yml
+You will be prompted to enter a password, which will be used to encrypt the file. The file will then be converted into an encrypted format.
+
+2. Decrypting a File
+To decrypt a file that was encrypted with Ansible Vault, use the ansible-vault decrypt command:
+
+ansible-vault decrypt vars.yml
+You will need to enter the same password that was used to encrypt the file.
+
+3. Viewing an Encrypted File
+To view the contents of an encrypted file without decrypting it permanently, use the ansible-vault view command:
+
+ansible-vault view vars.yml
+This command will prompt for the password and then display the decrypted contents in the terminal.
+
+4. Editing an Encrypted File
+To edit an encrypted file without decrypting it first, use the ansible-vault edit command:
+
+ansible-vault edit vars.yml
+This will open the file in your default text editor, allowing you to make changes. When you save and close the editor, the file will be automatically re-encrypted.
+
+5. Rekeying (Changing the Password)
+To change the password for an encrypted file, use the ansible-vault rekey command:
+
+ansible-vault rekey vars.yml
+You will be prompted to enter the old password and then the new password.
+
+
+4. Ansible Tags-:
+	Tags in Ansible are a powerful feature that allows you to selectively run specific parts of a playbook. By tagging tasks, roles, or entire plays, you can execute only those parts of the playbook that are relevant to your current needs. This is particularly useful for large playbooks where you might want to test or apply only a subset of tasks without running the entire playbook.
+
+  Running Playbooks with Tags
+To run only tasks or plays with specific tags, use the --tags option when executing the playbook:
+
+ansible-playbook site.yml --tags "apache"
+This command will only run tasks or roles tagged with apache.
+
+If you want to run multiple tags, you can list them as a comma-separated string:
+
+ansible-playbook site.yml --tags "apache,config"
+Skipping Tags
+You can also skip tasks or roles with specific tags by using the --skip-tags option:
+
+ansible-playbook site.yml --skip-tags "apache"
+This will run all tasks except those tagged with apache.
+
+Viewing Tags in a Playbook
+To see all the tags defined in a playbook, use the --list-tags option:
+
+ansible-playbook site.yml --list-tags
+This will display all the tags available in the playbook, helping you decide which ones to run or skip.
+
+
+5. Loops-:
+   Loops in Ansible allow you to repeat a task multiple times with different parameters or over a list of items. This is particularly useful for tasks like installing multiple packages, creating multiple users, or iterating over a list of items to perform similar operations.
+
+--- Basic Looping with loop
+The most common way to create a loop in Ansible is by using the loop directive. Here's an example:
+
+Example: Installing Multiple Packages
+
+- name: Install multiple packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - httpd
+    - mariadb-server
+    - php
+
+In this example, the yum module will be called three times, once for each package in the list.
+
+--- Looping Over a List of Dictionaries
+You can also loop over a list of dictionaries, which is useful when each item has multiple properties.
+
+Example: Creating Users with Different Parameters
+- name: Create users
+  user:
+    name: "{{ item.name }}"
+    state: present
+    groups: "{{ item.groups }}"
+  loop:
+    - { name: 'alice', groups: 'admin' }
+    - { name: 'bob', groups: 'developers' }
+    - { name: 'carol', groups: 'users' }
+Here, the user module creates three different users, each with its own group assignment.
+
+--- Looping with with_items
+Before the introduction of loop, Ansible used with_items, which is still supported but is considered deprecated in favor of loop.
+
+Example: Installing Multiple Packages Using with_items
+- name: Install multiple packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - httpd
+    - mariadb-server
+    - php
+
+--- Looping with with_nested
+with_nested allows you to loop over combinations of lists (Cartesian product).
+
+Example: Looping Over Combinations
+- name: Create directories for users
+  file:
+    path: "/home/{{ item.0 }}/{{ item.1 }}"
+    state: directory
+    owner: "{{ item.0 }}"
+  with_nested:
+    - [ 'alice', 'bob' ]
+    - [ 'projects', 'data' ]
+
+This will create the following directories:
+
+/home/alice/projects
+/home/alice/data
+/home/bob/projects
+/home/bob/data
+
+--- Looping with with_fileglob
+with_fileglob is useful for iterating over files that match a specific pattern.
+
+Example: Copying Multiple Files
+- name: Copy all .conf files
+  copy:
+    src: "{{ item }}"
+    dest: /etc/myapp/
+  with_fileglob:
+    - /src/configs/*.conf
+This will copy all .conf files from /src/configs/ to /etc/myapp/.
+
+--- Loop Control with loop_control
+You can control various aspects of loops using loop_control, such as changing the loop variable name, limiting the output, and more.
+
+Example: Changing Loop Variable Name
+yaml
+Copy code
+- name: Install multiple packages with a custom loop variable
+  yum:
+    name: "{{ pkg }}"
+    state: present
+  loop:
+    - httpd
+    - mariadb-server
+    - php
+  loop_control:
+    loop_var: pkg
+
+In this example, pkg is used as the loop variable instead of the default item.
+
+Example: Limiting Output with label
+- name: Create users with limited output
+  user:
+    name: "{{ item.name }}"
+    state: present
+    groups: "{{ item.groups }}"
+  loop:
+    - { name: 'alice', groups: 'admin' }
+    - { name: 'bob', groups: 'developers' }
+    - { name: 'carol', groups: 'users' }
+  loop_control:
+    label: "{{ item.name }}"
+With label, only the user's name will be displayed in the output, making it more readable.
+
+--- Looping with until
+The until loop allows you to retry a task until a certain condition is met, which is useful for tasks that might not succeed immediately.
+
+Example: Retry Until Success
+yaml
+Copy code
+- name: Wait for the service to become active
+  shell: systemctl is-active myservice
+  register: service_status
+  until: service_status.stdout == "active"
+  retries: 5
+  delay: 10
+In this example, the task will check the status of myservice and retry up to 5 times with a 10-second delay between attempts, until the service is active.
+
+--- Looping with with_dict
+with_dict allows you to loop over key-value pairs in a dictionary.
+
+Example: Loop Over a Dictionary
+- name: Manage services
+  service:
+    name: "{{ item.key }}"
+    state: "{{ item.value }}"
+  with_dict:
+    httpd: started
+    mariadb: stopped
+This example will start the httpd service and stop the mariadb service.
+
+
+5. Handlers in Ansible-:
+   In Ansible, handlers are special tasks that are triggered by other tasks when there is a change in the system. They are typically used to perform operations that should only occur when something has been altered, such as restarting a service after a configuration file has been modified.
+
+Notification: A regular task can notify a handler when it makes a change (e.g., when a package is installed, or a file is modified).
+Execution: The handler is then executed at the end of the play, ensuring that all necessary tasks are completed before the handler runs.
+Idempotency: Handlers are idempotent, meaning they will only run once even if notified multiple times within the same play.
+
+- hosts: webservers
+  tasks:
+    - name: Install Apache
+      yum:
+        name: httpd
+        state: present
+      notify:
+        - Restart Apache
+
+    - name: Copy Apache config file
+      copy:
+        src: /path/to/httpd.conf
+        dest: /etc/httpd/conf/httpd.conf
+      notify:
+        - Restart Apache
+        - Reload Firewall
+
+  handlers:
+    - name: Restart Apache
+      service:
+        name: httpd
+        state: restarted
+
+    - name: Reload Firewall
+      command: firewall-cmd --reload
+
+ 
+You can prevent all handlers from running in a playbook run by using the --skip-tags option with the handlers tag:
+ansible-playbook site.yml --skip-tags "handlers"
+
+6. Ansible Template-:
+  Ansible template module is used to generate configuration files or other text files from Jinja2 templates. Templates are files that contain both static content and dynamic expressions, which are evaluated and replaced with real values during the execution of the playbook. This allows you to create highly customizable configuration files that can be adapted to different environments or scenarios.
+
+Key Concepts
+Jinja2: Jinja2 is the templating language used by Ansible. It allows you to include variables, control structures (like loops and conditionals), and filters to manipulate data.
+Template Files: These are files with a .j2 extension that serve as the source for generating the final output files. They usually contain Jinja2 expressions.
+Template Module: The template module is the Ansible module used to process a Jinja2 template and write the resulting content to a file on the target host.
+
+7. Roles in Ansible-:
+  Roles in Ansible are a way to organize playbooks into reusable components. They enable you to automatically load certain variables, tasks, files, templates, and handlers based on a known file structure. Roles are designed to promote reusability and modularity, making it easier to manage complex playbooks by breaking them down into smaller, more manageable parts.
+
+Structure of a Role
+An Ansible role is a directory structure that contains all the necessary files to perform a particular function or set of related functions. Below is a typical structure of a role:
+
+roles/
+  └── role_name/
+      ├── defaults/
+      │   └── main.yml      # Default variables for the role
+      ├── files/
+      │   └── ...           # Files that can be deployed via copy or other file modules
+      ├── handlers/
+      │   └── main.yml      # Handlers that can be called by tasks within this role
+      ├── meta/
+      │   └── main.yml      # Role metadata, including dependencies
+      ├── tasks/
+      │   └── main.yml      # Main list of tasks to be executed by this role
+      ├── templates/
+      │   └── ...           # Templates that can be deployed via the template module
+      ├── tests/
+      │   ├── inventory     # Test inventory file for testing the role
+      │   └── test.yml      # Test playbook for the role
+      ├── vars/
+      │   └── main.yml      # Variables that are meant to be overridden by the user
+      └── README.md         # Optional documentation file
+
+Components of a Role
+defaults/: This directory contains default variables for the role. These variables have the lowest precedence, meaning they can easily be overridden by variables defined elsewhere (e.g., in the playbook or inventory).
+
+files/: This directory contains static files that can be copied to the target hosts using the copy module or referenced by tasks within the role.
+
+handlers/: This directory contains handlers that can be triggered by tasks within the role. Handlers typically manage services, such as restarting a service after a configuration file is updated.
+
+meta/: This directory contains metadata about the role, including any dependencies on other roles. The meta/main.yml file can specify dependencies that Ansible will automatically load before the role runs.
+
+tasks/: This is where the main list of tasks for the role is defined. The tasks/main.yml file is typically the entry point, and it can include other task files as needed.
+
+templates/: This directory contains Jinja2 templates that can be rendered and copied to the target hosts using the template module.
+
+tests/: This directory contains test files for the role. It includes an inventory and a test playbook that can be used to test the role in isolation.
+
+vars/: This directory contains variables that are meant to be overridden by the user. Variables defined here have a higher precedence than those in defaults/.
+
+README.md: This is an optional documentation file that can be used to provide information about the role, such as usage instructions, supported variables, and example playbooks.
+
+Using Roles in a Playbook
+Roles are included in a playbook using the roles keyword. Here's an example:
+
+- hosts: webservers
+  roles:
+    - role: apache
+    - role: mysql
+      vars:
+        mysql_root_password: "securepassword"
+
+In this example:
+
+The apache role and mysql role are applied to the webservers group of hosts.
+The mysql role is passed a variable mysql_root_password to customize its behavior.
+Role Dependencies
+Roles can specify dependencies on other roles in the meta/main.yml file. This ensures that dependent roles are executed in the correct order.
+
+Example: Defining Role Dependencies
+# roles/webapp/meta/main.yml
+dependencies:
+  - role: common
+  - role: apache
+    vars:
+      apache_port: 8080
+  - role: mysql
+    vars:
+      mysql_root_password: "securepassword"
+In this example:
+
+The webapp role depends on the common, apache, and mysql roles.
+The apache and mysql roles are passed specific variables to configure them appropriately.
+Role Variables and Precedence
+Ansible has a well-defined order of precedence for variables, with roles playing a significant part. Here's the order from lowest to highest precedence:
+
+Role defaults (defaults/main.yml)
+Inventory group vars
+Inventory host vars
+Playbook group vars
+Playbook host vars
+Host facts
+Playbook vars
+Block vars (only for tasks in the block)
+Task vars (only for the task)
+Role vars (vars/main.yml)
+Play vars files
+Include vars files
+Extra vars (--extra-vars)
+Example Role
+Here’s an example of a simple nginx role that installs and configures Nginx:
+
+Directory Structure
+roles/
+  └── nginx/
+      ├── defaults/
+      │   └── main.yml
+      ├── tasks/
+      │   └── main.yml
+      ├── handlers/
+      │   └── main.yml
+      ├── templates/
+      │   └── nginx.conf.j2
+      ├── meta/
+      │   └── main.yml
+      ├── vars/
+      │   └── main.yml
+      └── README.md
+defaults/main.yml
+nginx_port: 80
+
+vars/main.yml
+nginx_user: www-data
+
+tasks/main.yml
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+
+- name: Deploy Nginx config
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+  notify: Restart Nginx
+
+- name: Ensure Nginx is running
+  service:
+    name: nginx
+    state: started
+    enabled: true
+
+handlers/main.yml
+- name: Restart Nginx
+  service:
+    name: nginx
+    state: restarted
+
+templates/nginx.conf.j2
+server {
+    listen {{ nginx_port }};
+    server_name localhost;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+
+meta/main.yml
+dependencies:
+  - role: common
+
+
