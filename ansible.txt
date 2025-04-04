@@ -1,0 +1,85 @@
+1. install epel packge on amazon linux.
+sudo amazon-linux-extras install epel -y   use to install epel on linux machine
+
+2. update the linux machine
+yum update -y      
+
+3. install ansible and dependent packages ( install python git and ansible)
+yum install git python python-level python-pip openssl ansible -y    
+
+4.confirm wheather ansible is installed or not. ( check version)
+ansible --version             
+
+5.Add the client hostes in hostfile on master server.
+vi /etc/ansible/hosts          -----add group in the host file with ipaddress
+
+6.Enable inventry file on linux.
+vi /etc/ansible/ansible.cfg     ----enable inventry
+ 
+7.Create common user to work ansible
+adduser ansible                  -----creating user
+
+8.add created user to vi /etc/sudoers to get it as sudo previledges
+visudo                            --to change sudo file 
+ansible ALL=(ALL) NOPASSWD: ALL
+
+9.Make changes in sshd_config file to give permission
+vi /etc/ssh/sshd_config
+make changes in PasswordAuthentication yes
+		PermitRootlogin yes
+
+10. restart sshd service
+    sudo systemctl restart sshd
+
+
+11. Create private key to connect client without password. (su - ansible  to switch account)
+ ssh-keygen               ---run as ansible user from master node 
+ cd .ssh/
+ ls -ltr
+
+12. copy private key to client machine.
+ssh-copy-id ansible@172.31.26.23
+
+ ansible all --list-hosts
+
+
+## Ansible for Windows-:
+1. Create user account for windows server with required priviledges.
+2. check listerner ports it should be 5986 and 5985 -- winrm e winrm/config/Listener
+3. if it is not listening Https then follow below process
+
+Configuring HTTPS listener in Windows:
+
+Step1: Create Certificate
+New-SelfSignedCertificate -DnsName "DNS Name" -CertStoreLocation Cert:\LocalMachine\My
+Step2:
+Whitelist port 5985(winrm-http) and 5986(winrm-https) in the security group of the the windows server.
+Step3: Create HTTPS Listener
+winrm create winrm/config/Listener?Address=*+Transport=HTTPS '@{Hostname="DNS Name"; CertificateThumbprint="ThumbPrint"}'
+Step4:
+Add  new firewall rule for 5986
+netsh advfirewall firewall add rule name="Windows Remote Management (HTTPS-In)" dir=in action=allow protocol=TCP localport=5986
+Step5:
+Check the listener and make sure https listener is there.
+winrm e winrm/config/Listener
+
+4. Check The Service
+winrm get winrm/config
+Make sure the Basic Auth is set to true, if not then execute below commands.
+Set-Item -Force WSMan:\localhost\Service\auth\Basic $true
+
+
+ sudo dnf install ansible-core    install ansible on redhat machine
+
+master
+Dynamo
+Bablu@17
+
+Red hat linux server issue while connecting server from putty using username and pssword it throwing error as no supported authentication method available  to troubleshoot this issue make changes in below.
+
+cd /etc/ssh/sshd_config.d and then vi 50-cloud-init.conf and change PasswordAuthentication yes
+
+
+
+
+
