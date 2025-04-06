@@ -1,0 +1,63 @@
+1.Download the Jenkins RPM package
+wget https://pkg.jenkins.io/redhat-stable/jenkins-2.426.3-1.1.noarch.rpm
+
+2.Install Jenkins RPM package
+sudo yum localinstall jenkins-2.426.3-1.1.noarch.rpm -y
+
+sudo update-alternatives --config java      ----used to swich java versions
+3. Install OpenJDK 11 (Amazon Corretto 11):
+sudo amazon-linux-extras install java-openjdk11
+sudo yum install java-11-amazon-corretto-headless
+
+4. sudo cat /var/lib/jenkins/secrets/initialAdminPassword ------to extract root password
+
+username- root
+Pass-: root
+
+username- suraj
+Password-: Pa$$w0rd
+username-: raj
+pass-: Raj123
+
+
+
+du -h /var/lib/docker/volumes | sort -rh | head -n 10  to sized of path with sort as size and top 10 records
+
+sudo update-alternatives --config java to check installed version for java
+
+to build the job remotely with url-: (used this plugin-:Build Authorization Token Root)
+http://3.91.66.132:8080/buildByToken/build?job=demo1&token=mytoken1    ----url based trigger
+curl http://3.91.66.132:8080/buildByToken/build?job=demo1\&token=mytoken1  ---ssh based
+demo1---job name
+mytoken1-----token name
+
+parentjob-: downstream=childjob  when we run parent job automatically runs child job
+childjob-: upstream=parentjob
+
+https://dlcdn.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
+tar -zxvf apache-maven-3.9.6-bin.tar.gz
+
+install apache tomcat-: 
+
+wget https://downloads.apache.org/tomcat/tomcat-10/v10.1.19/bin/apache-tomcat-10.1.19.tar.gz
+tar -zxvf apache-tomcat-10.1.19.tar.gz
+
+/root/apache-tomcat-10.1.19/bin/startup.sh  ----to start tomcat
+/root/apache-tomcat-10.1.19/bin/shutdown.sh  ----to stop tomcat
+
+export PATH=/root/apache-maven-3.9.6/bin:$PATH  # For Maven 3.8.5   -----to switch the version in maven
+source ~/.bashrc                         ----Reload your shell configuration file to apply the changes:
+
+
+<Context antiResourceLocking="false" privileged="true" >
+  <!--
+  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />
+  -->
+</Context>
+
+ Pipeline as code-:
+there are two ways we can write code 1. scripted pipline 2. decelarative pipeline
+
+
+
