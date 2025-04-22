@@ -1,0 +1,48 @@
+create partition in Linux server by shrinking existing disk.-:
+
+1. lsblk    ----to check all disks and partition
+2. sudo fdisk -l   ---to check all disks with their partition
+3. indentify disk which you want to create partion-:
+4. start fdisk with disk name---   sudo fdisk /dev/sdb
+5. resizing existing partion-:
+  sudo parted /dev/sda     ---select disk
+  In the parted prompt, follow these steps:
+Display the partition table with print.
+Select the partition to resize (/dev/sda1 in this case) using resizepart.
+Choose the new end size (e.g., 25GB).
+Example command to resize the partition:
+-- command ---- "resizepart 1 25GB"
+6. Create a new partition: After resizing, you can now use fdisk to create partion
+   start fdisk with disk name---   sudo fdisk /dev/sda
+   Create a New Partition:
+After running the command, you will enter the fdisk interactive shell. Follow these steps:
+Type n to create a new partition.
+Type p to select a primary partition or e for an extended partition (depending on your needs).
+Select the partition number (if prompted), or press Enter to choose the default.
+Define the partition size by specifying the start and end sectors or the size (e.g., +20G for a 20 GB partition).
+After creating the partition:
+Type w to write the changes to the disk.
+This will save the partition table and exit fdisk
+
+7.
+Format the New Partition:
+Format the partition with a file system of your choice. For example, to format the partition with the ext4 filesystem:
+sudo mkfs.ext4 /dev/sda17
+Replace /dev/sda17 with your actual partition name.
+8.
+Mount the Partition:
+To use the partition, you need to mount it. Create a mount point (a directory) and mount the partition:
+sudo mkdir /mnt/new_partition
+sudo mount /dev/sda17 /mnt/new_partition
+9.
+Make the Mount Permanent (Optional):
+If you want the partition to mount automatically after reboot, edit the /etc/fstab file:
+sudo nano /etc/fstab
+Add a line at the bottom like this:
+
+/dev/sda17  /mnt/new_partition  ext4  defaults  0  2
+
+Save and exit (Ctrl+O to write out, then Ctrl+X to exit).
+
+
+  
