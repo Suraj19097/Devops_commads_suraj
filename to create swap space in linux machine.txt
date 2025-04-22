@@ -1,0 +1,22 @@
+to create swap space-
+1. lsblk       ------List Available Disks and Partitions:
+2.select the disk where you want partition.if only one disk is avilable then add new volume and attach it to instance.
+3.sudo fdisk /dev/xvdf1    -----Launch fdisk and select disk which you want to create partition </dev/xvdf1> replace this with your disk path
+4. Create a New Partition: Once inside fdisk, you can create a new partition:
+Type n and press Enter to create a new partition.
+Choose whether you want to create a primary or extended partition.(default primery)
+Specify the partition number (e.g., 1 for the first partition).
+Specify the starting and ending sectors (or use the default to use the entire disk).(select size of partition)
+press p to check all preasent partion on disk and check ID it should be 82 for swap space.so to check press t and entre 82 and again hit entre.
+Press w to write the changes to the disk and exit. (used to save )
+
+5. partprobe  ----inform to kernal
+6.  sudo mkswap /dev/xvdf1    ----format it as swap:
+7.  sudo swapon /dev/xvdf1   ----Once the swap partition is formatted, you can enable it
+    sudo swapon /dev/xvdf1    -----you can disible it
+8. vi /etc/fstab 
+  and add below line in this file. To make the swap partition permanent across reboots, add an entry for it in /etc/fstab. Open /etc/fstab in a text editor and add the following line:
+	/dev/sdb1   none    swap    sw    0   0
+9. sudo swapon --show    ---You can verify that the swap partition is active and in use by running:
+
+10. to check swap space ---   free -h
